@@ -1,0 +1,531 @@
+def SayGreetings():
+    response =''
+    myname = ''
+    #lets say hello
+    textz = SpeakToMe()
+    textz = textz.encode('utf-8')
+    texts = textz.split()
+    inputs= [n.lower() for n in datafile[0]['text']]
+    #outputs = [o for o in datafile[0]['responses']]
+    
+    print(inputs)
+    for x  in  texts:
+        if x.lower() in inputs:
+          
+           responses = random.choice(datafile[0]['responses'])
+           responses = [ "friend" if x == "<Human>" else x  for x in responses.split()]
+           
+        else:
+            print("Please I didn't get that")
+    responses = " ".join(responses)
+    return responses
+
+
+
+def SayGreetings():
+    response =''
+    myname = ''
+    #lets say hello
+    textz = SpeakToMe()
+    textz = textz.encode('utf-8')
+    texts = textz.split()
+    inputs= [n.lower() for n in datafile[0]['text']]
+    #outputs = [o for o in datafile[0]['responses']]
+    
+    print(inputs)
+    for x  in  texts:
+        if x.lower() in inputs:
+           print("Please can you tell me your name?")
+           sayName = gTTS(text = "Please can you tell me your name?", lang='en', slow=False)
+           tts_service.say("Please can you tell me your name?")
+           sayName.save("name.mp3")
+           playsound("name.mp3")
+           getname = SpeakToMe()
+           getname = getname.encode('utf-8')
+           names = getname.split()
+           name  = [ x for x in names]
+           try:
+              myname = str(name[-1])#names
+           except IndexError: 
+              myname = ''
+           
+
+           responses = random.choice(datafile[0]['responses'])
+           
+           if myname == '':
+              responsez = ["friend" if  x =="<Human>" else x for x in responses.split()]
+              
+           elif myname !='':
+              responsez = [myname if  x =="<Human>" else x for x in responses.split()]
+        elif x.lower() not in inputs or x.lower() == " ":
+              responses = random.choice(datafile[0]['responses'])
+              if myname == '':
+                 responsez = ["friend" if  x =="<Human>" else x for x in responses.split()]
+              
+              elif myname !='':
+                 responsez = [myname if  x =="<Human>" else x for x in responses.split()] 
+        
+        else:
+            print("False")
+        response = " ".join(responsez)  
+        print("Pepper:", response)
+    return response
+
+
+
+
+def TellDirection(sentence):
+    print(sentence)
+    sentence = sentence.encode("utf-8")
+    sentence = sentence.split()
+    sentence = [n.lower() for n in sentence]
+    for word in sentence:
+        if word in accompany_wordlist and "office" in sentence:
+           #return toilet response if accompany...
+           TaccompanyResponse = datafile[1]['responses']
+           TaccompanyResponse = " ".join(TaccompanyResponse)
+           toiletAccResponse = [n.lower() for n in  TaccompanyResponse.split()]
+           print("Accompany office response:",toiletAccResponse)
+           firstSent = toiletAccResponse[0]
+           lastSent  = toiletAccResponse[3:]
+           for speech in toiletAccResponse:
+               if speech == firstSent:
+                  accSpeak = gTTS(text = "please follow me to the office", lang='en', slow=False)
+                  accSpeak.save("speech.mp3")
+                  playsound("speech.mp3")
+                  move_round(motion_service)
+                  time.sleep(1)
+               elif speech == "<turn_left>":
+                    print("Pepper:", "we will turn left")
+                    sayLeft = gTTS(text = "we will turn left", lang='en', slow=False)
+                    sayLeft.save("left.mp3")
+                    playsound("left.mp3")
+                    tts_service.say("we will turn left")
+                    move_left(motion_service)
+                  
+               elif speech == "<go_forward>":
+                    print("Pepper:", "we are moving forward")
+                    sayForward = gTTS(text = "we are moving forward", lang='en', slow=False)
+                    sayForward.save("straight.mp3")
+                    playsound("straight.mp3")
+                    tts_service.say("we are moving forward")
+                    move_forward(motion_service)
+               elif speech == "<turn_right>":
+                    print("Pepper:", "we will turn right")
+                    sayRight = gTTS(text = "we will turn right", lang='en', slow=False)
+                    sayRight.save("right.mp3")
+                    playsound("right.mp3")
+                    tts_service.say("we will turn right")
+                    turn_right(motion_service)
+               elif speech == "<in_front>":
+                    print("Pepper:", "please we are now in front of the office")
+                    sayInfront = gTTS(text = "please we are now in front of the office", lang='en', slow=False) 
+                    sayInfront.save("front.mp3")
+                    playsound("front.mp3")
+                    tts_service.say("please we are  now in front of the office")
+                    break
+                    #turn_round(motion_service)
+                    #move_forward(motion_service)
+                    '''
+               elif speech == lastSent:
+                    saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                    saySeeYou.save("seeyou.mp3")
+                    playsound("seeyou.mp3")'''
+                    
+               
+                 
+               
+                       
+         
+        elif word.lower() in  information_keywordlist and "office" in sentence: 
+             #return toilet response if information
+            
+             toiletResponseinfo = datafile[5]['responses']
+             toiletResponseinfo = " ".join(toiletResponseinfo)
+             toiletResponseinfo = [n.lower() for n in  toiletResponseinfo.split()]
+             print("Information office response:", toiletResponseinfo)
+             firstSent = toiletResponseinfo[0]
+             lastSent  = toiletResponseinfo[3:]
+             for speech in toiletResponseinfo:
+               if speech == firstSent:
+                  print("Pepper:", "to go to the office")
+                  speakFirst = gTTS(text = "to go to the office", lang='en', slow=False)
+                  speakFirst.save("speech.mp3")
+                  playsound("speech.mp3")
+                  
+               elif speech == "<turn_left>":
+                    print("Pepper:", "you will turn left")
+                    sayLeft = gTTS(text = "you will turn left", lang='en', slow=False)
+                    
+                    sayLeft.save("left.mp3")
+                    playsound("left.mp3")
+                    tts_service.say("you will turn left")
+                    direction_left(motion_service)
+                    #break
+               elif speech == "<go_forward>":
+                    print("Pepper:", "you will walk some two meters straight ")
+                    sayForward = gTTS(text = "you will walk some two meters straight ", lang='en', slow=False)
+                    sayForward.save("straight.mp3")
+                    playsound("straight.mp3")
+                    tts_service.say("you will walk some two meters straight ")
+                    go_forward(motion_service)
+                    #break
+               elif speech == "<turn_right>":
+                    print("Pepper:", "you will make  right turn")
+                    sayRight = gTTS(text = "you will make  right turn", lang='en', slow=False)
+                    sayRight.save("right.mp3")
+                    playsound("right.mp3")
+                    tts_service.say("you will make  right turn")
+                    direction_right(motion_service)
+                    #break 
+               elif speech == "<in_front>":
+                    print("Pepper:", "you will find the office")
+                    sayInfront = gTTS(text = "you will find the office", lang='en', slow=False) 
+                    sayInfront.save("front.mp3")
+                    playsound("front.mp3")
+                    tts_service.say("you will find the office")
+                    break
+                    '''
+               elif speech == lastSent:
+                    saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                    saySeeYou.save("seeyou.mp3")
+                    playsound("seeyou.mp3")
+                    #break'''
+              
+                      
+        
+        elif word.lower() in accompany_wordlist and "classroom" in sentence:    
+            
+            #return classroom accompany 
+            classAccResponse = datafile[3]['responses']
+            classAccResponse = " ".join(classAccResponse)
+            classroomAccResponse = [n.lower() for n in classAccResponse.split()]
+            print("classroom Accompany response:",classroomAccResponse)
+            firstSent = classroomAccResponse[0]
+            lastSent  = classroomAccResponse[3:] 
+            for speech in classroomAccResponse:
+                if speech == firstSent:
+                   print("Pepper:", "please follow me to the classroom")
+                   accSpeak = gTTS(text = "please follow me to the classroom", lang='en', slow=False)
+                   accSpeak.save("speech.mp3")
+                   tts_service.say("please follow me to the classroom")
+                   playsound("speech.mp3")
+                   turn_round(motion_service)
+                   time.sleep(1)
+                  #move_forward(motion_service)
+                elif speech == "<turn_left>":
+                   print("Pepper:", "we will make left left now")
+                   sayLeft = gTTS(text = "we will make left left now", lang='en', slow=False)
+                   sayLeft.save("left.mp3")
+                   playsound("left.mp3")
+                   tts_service.say("we will make left turn now")
+                   turn_left(motion_service)
+                  
+                elif speech == "<go_forward>":
+                   print("Pepper:", "we are going to move two step forward")
+                   sayForward = gTTS(text = "we are going to move two step forward", lang='en', slow=False)
+                   sayForward.save("straight.mp3")
+                   playsound("straight.mp3")
+                   tts_service.say("we are going to move two step forward")
+                   move_forward(motion_service)
+                elif speech == "<turn_right>":
+                   sayRight = gTTS(text = "please we will make a right turn now", lang='en', slow=False)
+                   sayRight.save("right.mp3")
+                   playsound("right.mp3")
+                   tts_service.say("please we will make a right turn now")
+                   turn_right(motion_service)
+                elif speech == "<in_front>":
+                   print("Pepper:", "please we are now in front of the classroom")
+                   sayInfront = gTTS(text = "please we are now in front of the classroom", lang='en', slow=False) 
+                   sayInfront.save("front.mp3")
+                   playsound("front.mp3")
+                   tts_service.say("please we are now in front of the classroom")
+                   break
+                   #turn_round(motion_service)
+                   #move_forward(motion_service)
+                   '''
+                elif speech == lastSent:
+                   saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                   saySeeYou.save("seeyou.mp3")
+                   playsound("seeyou.mp3")'''
+                   
+                
+                
+             
+         
+        elif word.lower() in information_keywordlist and "classroom" in sentence:    
+            
+            #return classroom information
+            classInfoResponse =  datafile[7]['responses']
+            classInfoResponse = " ".join(classInfoResponse)
+            classroomInfoResponse = [n.lower() for n in classInfoResponse.split()]
+            print("information classroom response:", classroomInfoResponse)
+            firstSent = classroomInfoResponse[0]
+            lastSent  = classroomInfoResponse[3:] 
+            for speech in classroomInfoResponse:
+                if speech == firstSent:
+                   print("Pepper:", "to go to the classroom")
+                   speakFirst = gTTS(text = "to go to the classroom", lang='en', slow=False)
+                   speakFirst.save("speech.mp3")
+                   playsound("speech.mp3")
+                   time.sleep(1)
+                elif speech == "<turn_left>":
+                     print("Pepper:", "you will make left turn ")
+                     sayLeft = gTTS(text = "you will make left turn ", lang='en', slow=False)
+                     sayLeft.save("left.mp3")
+                     playsound("left.mp3")
+                     tts_service.say("you will make left turn ")
+                     direction_left(motion_service)
+                elif speech == "<go_forward>":
+                     print("Pepper:", "then you go straight")
+                     sayForward = gTTS(text = "then you go straight", lang='en', slow=False)
+                     sayForward.save("straight.mp3")
+                     playsound("straight.mp3")
+                     tts_service.say("then you go straight")
+                     go_forward(motion_service)
+                elif speech == "<turn_right>":
+                     print("Pepper:", "you will make a right turn")
+                     sayRight = gTTS(text = "you will make a right turn", lang='en', slow=False)
+                     sayRight.save("right.mp3")
+                     playsound("right.mp3")
+                     tts_service.say("you will make a right turn")
+                     direction_right(motion_service)
+                elif speech == "<in_front>":
+                     print("Pepper:", "you will be in front of the classroom")
+                     sayInfront = gTTS(text = "you will be in front of the classroom", lang='en', slow=False) 
+                     sayInfront.save("front.mp3")
+                     playsound("front.mp3")
+                     tts_service.say("you will be in front of the classroom")
+                     break
+                     '''
+                elif speech == lastSent:
+                     saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                     saySeeYou.save("seeyou.mp3")
+                     playsound("seeyou.mp3")'''
+                     
+                 
+
+        elif word.lower() in accompany_wordlist and "library" in sentence:    
+            
+            #return library accompany 
+            libraryAccResponse = datafile[2]['responses']
+            libraryAccResponse = " ".join(libraryAccResponse)
+            libraryaccompany = [n.lower() for n in libraryAccResponse.split()]
+            print("library accompany response:", libraryaccompany)
+            firstSent = libraryaccompany[0]
+            lastSent  = libraryaccompany[3:] 
+            for speech in libraryaccompany:
+                if speech == firstSent:
+                   print("Pepper:", "please follow me to the library")
+                   accSpeak = gTTS(text = "please follow me to the library", lang='en', slow=False)
+                   accSpeak.save("speech.mp3")
+                   playsound("speech.mp3")
+                   turn_round(motion_service)
+                   time.sleep(1)
+                  #move_forward(motion_service)
+                elif speech == "<turn_left>":
+                   print("Pepper:", "we will make left turn now")
+                   sayLeft = gTTS(text = "we will make a left turn now", lang='en', slow=False)
+                   sayLeft.save("left.mp3")
+                   playsound("left.mp3")
+                   tts_service.say("we will make a left turn now")
+                   turn_left(motion_service)
+                  
+                elif speech == "<go_forward>":
+                   print("Pepper:", "we will move some two steps forward") 
+                   sayForward = gTTS(text = "we will move some two steps forward", lang='en', slow=False)
+                   sayForward.save("straight.mp3")
+                   playsound("straight.mp3")
+                   tts_service.say("we will move some two steps forward")
+                   move_forward(motion_service)
+                elif speech == "<turn_right>":
+                   print("Pepper:", "we will make right turn now")
+                   sayRight = gTTS(text = "we will make right turn now", lang='en', slow=False)
+                   sayRight.save("we right.mp3")
+                   playsound("right.mp3")
+                   tts_service.say("we will make right turn now")
+                   move_right(motion_service)
+                elif speech == "<in_front>":
+                   print("Pepper:", "we are now  in front of the library")
+                   sayInfront = gTTS(text = "we are now in front of the library", lang='en', slow=False) 
+                   sayInfront.save("front.mp3")
+                   playsound("front.mp3")
+                   tts_service.say("we are now in front of the library")
+                   break
+                   #time.sleep(1)
+                   #turn_round(motion_service)
+                   #move_forward(motion_service)
+                   '''
+                elif speech == lastSent:
+                   saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                   saySeeYou.save("seeyou.mp3")
+                   playsound("seeyou.mp3")
+                   tts_service.say("nice to see you")
+                   '''
+                
+               
+             
+         
+        elif word.lower() in information_keywordlist and "library" in sentence:    
+            
+            #return library information
+            libraryResponseInfo =  datafile[6]['responses']
+            libraryResponseInfo = " ".join(libraryResponseInfo)
+            libraryInfo = [n.lower() for n in  libraryResponseInfo.split()]
+            print("Information library response:",libraryInfo)
+            firstSent = libraryInfo[0]
+            lastSent  = libraryInfo[3:] 
+            for speech in libraryInfo:
+                if speech == firstSent:
+                   print("Pepper:",  "to go to the library")
+                   speakFirst = gTTS(text = "to go to the library", lang='en', slow=False)
+                   speakFirst.save("speech.mp3")
+                   playsound("speech.mp3")
+                   tts_service.say("to go to the library")
+                elif speech == "<turn_left>":
+                   print("Pepper:",  "you will turn left from the classroom")
+                   sayLeft = gTTS(text = "you will turn left from the classroom", lang='en', slow=False)
+                   sayLeft.save("left.mp3")
+                   playsound("left.mp3")
+                   tts_service.say("you will turn left from the classroom")
+                   direction_left(motion_service)
+                elif speech == "<go_forward>":
+                   print("Pepper:", "you will need go few steps forward")
+                   sayForward = gTTS(text = "you will need go few steps forward", lang='en', slow=False)
+                   sayForward.save("straight.mp3")
+                   playsound("straight.mp3")
+                   tts_service.say("you will need go few steps forward")
+                   go_forward(motion_service)
+                elif speech == "<turn_right>":
+                   print("Pepper:", "you will make right turn")
+                   sayRight = gTTS(text = "you will make right turn", lang='en', slow=False)
+                   sayRight.save("right.mp3")
+                   playsound("right.mp3")
+                   tts_service.say("you will make right turn")
+                   direction_right(motion_service)
+                elif speech == "<in_front>":
+                   print("Pepper:", "you will see  the library")
+                   sayInfront = gTTS(text = "you will see  the library", lang='en', slow=False) 
+                   sayInfront.save("front.mp3")
+                   playsound("front.mp3")
+                   tts_service.say("you will see  the library")
+                   break
+                   '''
+                elif speech == lastSent:
+                   saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                   saySeeYou.save("seeyou.mp3")
+                   playsound("seeyou.mp3")
+                   tts_service.say("nice to see you")
+                   break'''
+                
+                
+        elif word.lower() in accompany_wordlist and "cafeteria" in sentence:    
+            
+            #return cafeteria accompany 
+            cafeteriaAccResponse = datafile[4]['responses']
+            cafeteriaAccResponse = " ".join(cafeteriaAccResponse)
+            cafeteriaccompany = [n.lower() for n in cafeteriaAccResponse.split()]
+            print("cafateria accompany response:",cafeteriaccompany)
+            firstSent = cafeteriaccompany[0]
+            lastSent  = cafeteriaccompany[3:] 
+            for speech in cafeteriaccompany:
+                if speech == firstSent:
+                   print("Pepper:", "please follow me to the cafateria")
+                   accSpeak = gTTS(text = "please follow me to the cafateria", lang='en', slow=False)
+                   accSpeak.save("speech.mp3")
+                   playsound("speech.mp3")
+                   move_round(motion_service)
+                   time.sleep(1)
+                  #move_forward(motion_service)
+                elif speech == "<turn_left>":
+                   print("Pepper:", "we will make a left turn now")
+                   sayLeft = gTTS(text = "we will make a left turn now", lang='en', slow=False)
+                   sayLeft.save("left.mp3")
+                   playsound("left.mp3")
+                   tts_service.say("we will make a left turn now")
+                   move_left(motion_service)
+                  
+                elif speech == "<go_forward>":
+                   print("Pepper:", "we will move some  steps forward")
+                   sayForward = gTTS(text = "we will move some  steps forward", lang='en', slow=False)
+                   sayForward.save("straight.mp3")
+                   playsound("straight.mp3")
+                   tts_service.say("we will move some  steps forward")
+                   move_forward(motion_service)
+                elif speech == "<turn_right>":
+                   print("Pepper:", "we will  make a right turn now")
+                   sayRight = gTTS(text = "we will  make a right turn now", lang='en', slow=False)
+                   sayRight.save("right.mp3")
+                   playsound("right.mp3")
+                   tts_service.say("we will  make a right turn now")
+                   turn_right(motion_service)
+                elif speech == "<in_front>":
+                   print("Pepper:", "we are now in front of the cafateria")
+                   sayInfront = gTTS(text = "we are now in front of the cafateria", lang='en', slow=False) 
+                   sayInfront.save("front.mp3")
+                   playsound("front.mp3")
+                   tts_service.say("we are now in front of the cafateria")
+                   break
+                   #turn_round(motion_service)
+                   #move_forward(motion_service)
+                   '''
+                elif speech == lastSent:
+                   saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                   saySeeYou.save("seeyou.mp3")
+                   playsound("seeyou.mp3")
+                   tts_service.say("nice to see you")'''
+                   
+                               
+                
+         
+        elif word.lower() in information_keywordlist and "cafeteria" in sentence:    
+            
+            #return cafeteria information
+            cafeteriaResponseInfo =  datafile[8]['responses']
+            cafeteriaResponseInfo = " ".join(cafeteriaResponseInfo)
+            cafeteriaInfo = [n.lower() for n in  cafeteriaResponseInfo.split()]
+            print("information cafateria response:",cafeteriaInfo)
+            firstSent = cafeteriaInfo[0]
+            lastSent  = cafeteriaInfo[3:] 
+            for speech in cafeteriaInfo:
+                if speech == firstSent:
+                   print("Pepper:", "to go to the cafeteria")
+                   speakFirst = gTTS(text = "to go to the cafeteria", lang='en', slow=False)
+                   speakFirst.save("speech.mp3")
+                   playsound("speech.mp3")
+                   tts_service.say("to go to the cafeteria")
+                   
+                elif speech == "<turn_left>":
+                   print("Pepper:", "you will make  left from library")
+                   sayLeft = gTTS(text = "you will make  left from library", lang='en', slow=False)
+                   sayLeft.save("left.mp3")
+                   playsound("left.mp3")
+                   tts_service.say("you will make  left from library")
+                   direction_left(motion_service)
+                elif speech == "<go_forward>":
+                   print("Pepper:", "you go some few steps forward")
+                   sayForward = gTTS(text = "you go some few steps forward", lang='en', slow=False)
+                   sayForward.save("straight.mp3")
+                   tts_service.say("you go some few steps forward")
+                   playsound("straight.mp3")
+                   go_forward(motion_service)
+                elif speech == "<turn_right>":
+                   print("Pepper:", "you will make a right turn ")
+                   sayRight = gTTS(text = "you will make a right turn", lang='en', slow=False)
+                   sayRight.save("right.mp3")
+                   tts_service.say("you will make a right turn")
+                   playsound("right.mp3")
+                   direction_right(motion_service)
+                elif speech == "<in_front>":
+                   sayInfront = gTTS(text = "you will be in front of the cafeteria", lang='en', slow=False) 
+                   sayInfront.save("front.mp3")
+                   tts_service.say("you will be in front of the cafeteria")
+                   playsound("front.mp3")
+                   break
+                   '''
+                elif speech == lastSent:
+                   saySeeYou = gTTS(text = "nice to see you", lang='en', slow=False) 
+                   saySeeYou.save("seeyou.mp3")
+                   tts_service.say("nice to see you")
+                   playsound("seeyou.mp3")'''
+        

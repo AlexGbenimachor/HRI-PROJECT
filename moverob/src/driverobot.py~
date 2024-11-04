@@ -1,0 +1,262 @@
+#!/usr/bin/env python
+import io
+import qi
+import csv
+import cv2
+import time
+import vrep
+import math
+import rospy
+import motion
+import numpy as np
+import matplotlib.pyplot as plt
+
+from naoqi import ALProxy
+from random import randrange
+from numpy.linalg import inv
+
+from nav_msgs.msg import Odometry
+from std_msgs.msg import Int32, Float32
+from geometry_msgs.msg import Twist, Pose
+from sensor_msgs.msg import Image, JointState
+from scipy.interpolate import BSpline, make_interp_spline
+
+from pepper_movements  import myConnection, direction_left, go_forward,  direction_right, move_forward, move_round, move_right, move_left, Hello_Gesture, Make_Gesture
+
+# ROS Image message -> OpenCV2 image converter
+from cv_bridge import CvBridge, CvBridgeError
+
+
+
+
+
+
+#initialize the rospy node...
+rospy.init_node("driverobot", anonymous=True)
+rospy.loginfo("Start Robot Path Planning Program")
+'''
+IP = "localhost"
+PORT =  40811
+session =  myConnection(IP, PORT)
+motion_service = session.service("ALMotion")
+tts_service =session.service("ALTextToSpeech")
+print(motion_service)
+'''
+#print("let's start the program")
+vrep.simxFinish(-1)
+#robotics page 537 (motion planning)
+
+clientID = vrep.simxStart('127.0.0.1',19999,True,True,5000,5)
+
+
+if (clientID != -1):
+   print("connected to the vrep server")
+else:
+   print("it's not connected to the vrep server")
+   
+   
+
+#get the objects on the simulator...
+Dwheel = (2.0000e-02+2.0000e-01+2.0000e-02)  #define the wheel base...
+
+
+#buildings in the Vrep Simulation...
+clientID, office = vrep.simxGetObjectHandle(clientID, "office", vrep.simx_opmode_blocking )
+clientID, library = vrep.simxGetObjectHandle(clientID, "library", vrep.simx_opmode_blocking )
+clientID, cafeteria = vrep.simxGetObjectHandle(clientID, "cafeteria", vrep.simx_opmode_blocking )
+clientID, classroom = vrep.simxGetObjectHandle(clientID, "classroom", vrep.simx_opmode_blocking )
+clientID, defPosition = vrep.simxGetObjectHandle(clientID, "defpos", vrep.simx_opmode_blocking )
+
+
+#get Motors...
+clientID, rightMotor = vrep.simxGetObjectHandle(clientID, "rightMotor", vrep.simx_opmode_blocking )
+clientID, leftMotor = vrep.simxGetObjectHandle(clientID, "leftMotor", vrep.simx_opmode_blocking )
+clientID, bubbleSlider = vrep.simxGetObjectHandle(clientID, "bubbleRob_slider", vrep.simx_opmode_blocking )
+clientID, bubbleRob = vrep.simxGetObjectHandle(clientID, "bubbleRob", vrep.simx_opmode_blocking )
+
+
+#get Sensors...
+clientID, bubbleEyes = vrep.simxGetObjectHandle(clientID, "bubbleRob_eyes", vrep.simx_opmode_blocking )
+clientID, bubbleConnection = vrep.simxGetObjectHandle(clientID, "bubbleRob_connection", vrep.simx_opmode_blocking )
+clientID, RobbyNose = vrep.simxGetObjectHandle(clientID, "bubbleRob_SensingNose", vrep.simx_opmode_blocking )
+#print Objects...
+print("\n")
+print("Buildings")
+print("____"*10)
+#print building...
+print("office building:", office)
+print("library building:", library)
+print("cafeteria building:", cafeteria)
+print("classroom building:", classroom)
+print("default Position:", defPosition)
+   
+print("\n")
+print("Motors Objects")
+print("____"*10)
+#print Motors...
+print("right Object:", rightMotor)
+print("left Object:",  leftMotor)
+print("slider:", bubbleSlider)
+print("bubbleRob:", bubbleRob)
+
+print("\n")
+#print Sensors
+print("Sensors")
+print("____"*10)
+print("RobbyNose:",    RobbyNose)
+print("Bubble Eyes:", bubbleEyes)
+print("connection:", bubbleConnection)
+
+print("\n")
+#get the building location...
+print("building Location")
+print("____"*10)
+returnCode, officePos =  vrep.simxGetObjectPosition(clientID, office, -1, vrep.simx_opmode_blocking)
+returnCode, libraryPos =  vrep.simxGetObjectPosition(clientID, library, -1, vrep.simx_opmode_blocking)
+returnCode, cafeteriaPos =  vrep.simxGetObjectPosition(clientID, cafeteria, -1, vrep.simx_opmode_blocking)
+returnCode, classroomPos =  vrep.simxGetObjectPosition(clientID, classroom, -1, vrep.simx_opmode_blocking)
+
+   
+
+print("\n")
+#print robot location...
+print("robot location")
+print("____"*10)
+returnCode, robotPos = vrep.simxGetObjectPosition(clientID,  bubbleRob, -1, vrep.simx_opmode_blocking)
+print("\n")
+#print robot position...
+print("robot position")
+print("bubble Rob:", robotPos)
+
+
+print("\n")
+#print building position...
+print("building position")
+print("____"*10)
+print("office position:", officePos)
+print("library position:", libraryPos)
+print("cafeteria position:", cafeteriaPos)
+print("classroom position:", classroomPos)
+
+
+#get object positions...
+
+
+
+#robot position...
+def getRobotPos():
+    returnCode, robotPos = vrep.simxGetObjectPosition(clientID,  bubbleRob, -1, vrep.simx_opmode_blocking)
+    theta = math.atan2(round(robotPos[1],2), round(robotPos[0],2))
+    return[round(robotPos[0],2), round(robotPos[1],2), round(theta,2)]
+    
+
+#location positions...    
+def getOfficePos():
+    returnCode, officePos =  vrep.simxGetObjectPosition(clientID, office, -1, vrep.simx_opmode_blocking)
+    theta = math.atan2(officePos[1], officePos[0])
+    return [round(officePos[0],2), round(officePos[1],2), round(theta,2)]
+        
+
+def getCafeteriaPos():
+    returnCode, cafeteriaPos =  vrep.simxGetObjectPosition(clientID, cafeteria, -1, vrep.simx_opmode_blocking)
+    theta = math.atan2(cafeteriaPos[1], cafeteriaPos[0])
+    return [round(cafeteriaPos[0],2), round(cafeteriaPos[1],2), round(theta,2)]
+    
+def getLibraryPos():
+    returnCode, libraryPos =  vrep.simxGetObjectPosition(clientID, library, -1, vrep.simx_opmode_blocking)
+    theta = math.atan2(libraryPos[1], libraryPos[0])
+    return [round(libraryPos[0],2), round(libraryPos[1],2), round(theta,3)]
+    
+def classroomPos():
+    returnCode, classroomPos =  vrep.simxGetObjectPosition(clientID, classroom, -1, vrep.vrep.simx_opmode_blocking)
+    theta = math.atan2(classroomPos[1], classroomPos[0])
+    return[round(classroomPos[0],2), round(classroomPos[1]), round(theta,2)]
+    
+    
+    
+
+
+
+
+
+"""drive Robot..."""
+#drive Robot Forward, Backward, turnleft, turn right
+def forward():
+    
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, leftMotor, 1, vrep.simx_opmode_blocking) 
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, rightMotor,1, vrep.simx_opmode_blocking )
+    #move_forward(motion_service)
+    
+def backward():
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, leftMotor, -1, vrep.simx_opmode_blocking) 
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, rightMotor, -1, vrep.simx_opmode_blocking) 
+    
+
+def turnLeft(O_left,  O_right ):
+   
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, leftMotor, O_left, vrep.simx_opmode_blocking ) 
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, rightMotor, O_right, vrep.simx_opmode_blocking) 
+    #move_left(motion_service)
+    
+
+def turnRight(O_left,  O_right):
+    
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, leftMotor, O_left,vrep.simx_opmode_blocking ) 
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, rightMotor, O_right, vrep.simx_opmode_blocking) 
+   # move_right(motion_service)
+
+def stop():
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, rightMotor,0, vrep.simx_opmode_blocking) 
+    returnCode = vrep.simxSetJointTargetVelocity(clientID, leftMotor, 0, vrep.simx_opmode_blocking) 
+   # motion_service.stopMove()
+ 
+
+
+#Detect Object sensors
+
+def ObjectDetect():
+    returnCode,detected, detectObjectPoint, detectedObjectHandle,NormVector=vrep.simxReadProximitySensor(clientID, RobbyNose,vrep.simx_opmode_oneshot_wait)
+    return [detected, detectObjectPoint, detectedObjectHandle]
+       
+       
+
+     
+
+'''
+print("robot position  data:", robdata) 
+print("office position data:", officeData)
+print("library position data:", libraryData)
+print("cafeteria position data:", cafeteriaData)
+print("classroom position data:", classroomData)  
+'''
+
+def distance_and_angle(robData, locData, inDegrees = False):
+    #compute the distance...
+    distance = math.sqrt((locData[0]-robData[0])**2 + (locData[1]-robData[1])**2)
+    
+    #compute the radian goal angle...
+    radian_angle = math.atan2(locData[1]-robData[1], locData[0]-robData[0])
+    
+    deg_angle = np.degrees(radian_angle)
+    if inDegrees:
+       return [round(distance,2), round(deg_angle,2)]
+    else:
+       return[round(distance,2), round(radian_angle,2)]
+       
+#compute the radius...       
+def computeRadius():
+    radius = math.sqrt((0.08)**2 + (0.08)**2)
+    radius = round(radius,3)
+    return radius
+    
+#compute rotation...
+def computeRotation(angle):
+    radius = computeRadius()
+    Cir = 2 * math.pi * radius
+    rotation = angle * Dwheel/Cir*2
+    return rotation
+    
+    
+    
+def DriveRobotToLocation(robData, gotoLocation):    
+

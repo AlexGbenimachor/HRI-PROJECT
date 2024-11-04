@@ -1,0 +1,204 @@
+import qi
+import time
+import math
+import motion
+import numpy as np
+from naoqi import ALProxy
+from random import randrange
+#motionProxy = ALProxy("")
+
+#session = qi.Session()
+#motionService = session.connect("tcp://" + robotIP + ":" + str(PORT))
+
+#define connection function ...
+
+def myConnection(IP, PORT):
+    session = qi.Session()
+    try:
+       session.connect("tcp://" + IP + ":" + str(PORT))
+    except RuntimeError:
+        print ("Can't connect to Naoqi at ip \"" + IP  + "\" on port " + str(PORT) +".\n" "Please check your script arguments. Run with -h option for help.")
+    return session
+
+def direction_left(motion_service):
+    speed = 0.6 #define the speed...
+
+    JointNames = ["RHand", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll",  "RWristYaw"]
+    JointNames2 = ["LHand", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll",  "LWristYaw"]
+    jointAngles2 = [90, 90, -30, -45, -45, 0 ]
+    jointAngles2 = [x * motion.TO_RAD for x in jointAngles2]
+    jointAngles = [45, 20, 45, 0,90, 90 ]
+    jointAngles = [x * motion.TO_RAD for x in jointAngles]
+    #print(jointAngles)
+    #print(jointAngles2)
+    motion_service.angleInterpolationWithSpeed(JointNames, jointAngles, speed)
+    motion_service.angleInterpolationWithSpeed(JointNames2, jointAngles2, speed)
+    
+def direction_right(motion_service):
+    speed = 0.6 #define the speed...
+
+    JointNames = ["RHand", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll",  "RWristYaw"]
+    JointNames2 = ["LHand", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll",  "LWristYaw"]
+    jointAngles2 = [90, 90, -30, -45, -45, 0 ]
+    jointAngles2 = [x * motion.TO_RAD for x in jointAngles2]
+    jointAngles = [90, 20, -45, 90,0, 0 ]
+    jointAngles = [x * motion.TO_RAD for x in jointAngles]
+    '''print(jointAngles)
+    print(jointAngles2)'''
+    motion_service.angleInterpolationWithSpeed(JointNames, jointAngles, speed)
+    motion_service.angleInterpolationWithSpeed(JointNames2, jointAngles2, speed)
+   
+
+def go_forward(motion_service):
+    speed = 0.6 #define the speed...
+
+    jointNames=["LElbowRoll", "LShoulderPitch"]
+    jointvalues = [-0.79, 0.5]
+    #elbowangles = randrange(len(LElbowValues))
+    motion_service.angleInterpolationWithSpeed(jointNames,jointvalues, 0.6)
+    jointvalues2 = [0.79, 1]
+    motion_service.angleInterpolationWithSpeed(jointNames,jointvalues2, 0.6)
+
+
+
+ 
+def move_forward(motionService):
+    r = 1
+    print("move forward:", r)
+    lv = 0.5 * r
+    av = 0.2
+    dt = abs(lv/av)
+    motionService.move(lv, 0, 0)
+    #time.sleep(dt)
+    #motionService.stopMove()
+    
+    
+def move_right(motionService):
+    r = 1
+    print("turn right:", r)
+    angle = math.pi/2
+    dt = abs(angle)
+    print("dt:", dt)
+    motionService.move(0, 0, -angle)
+    #time.sleep(dt)
+   # motionService.stopMove()
+       
+    
+
+def move_left(motionService):
+    r = 1
+    print("turn right:", r)
+    angle = math.pi/2
+    dt = abs(angle)
+    print("dt:", dt)
+    motionService.move(0, 0, angle)
+    #time.sleep(dt)
+    #motionService.stopMove()
+            
+     
+def move_round(motionService):
+     C = 2 * math.pi * 0.07#compute the circumference...
+     C = round(C, 2)
+     dwheel = 0.176
+     angleToRAD =  360 * math.pi/180
+     #compute the rotation...
+     rotation  = round(angleToRAD,2) * dwheel/(2*C)
+     V = 0.3
+     W = V/0.07
+     d = 2 #steps...
+     dt = d/V
+     motionService.move(0,W, round(rotation,2))
+     #time.sleep(dt)
+     #motionService.stopMove() 
+
+     
+
+def Make_Gesture(motionservice):
+    #angles...
+    HeadYawVals = [0.1, -0.1]
+    HeadPitchVals = [0.1]
+
+    LWristYawVals = [-1.0]
+    LElbowRollVals = [-0.7, -1.4]
+    LShoulderRollVals = [0.1, 0.5]
+    LShoulderPitchVals = [1.2]
+
+    RWristYawVals = [1.4]
+    RElbowRollVals = [1.4, 0.7]
+    RShoulderRollVals = [-0.1, -0.5]
+    RShoulderPitchVals = [1.2]
+    
+    #joint names
+    jointNames = [
+        "HeadPitch", 
+        "HeadYaw", 
+        "LElbowRoll", 
+        "LWristYaw", 
+        "RElbowRoll", 
+        "RWristYaw", 
+        "RShoulderRoll", 
+        "LShoulderRoll",
+        "RShoulderPitch",
+        "LShoulderPitch"
+    ]
+    times = [1.0] * 10
+
+    angles = [
+        HeadPitchVals[randrange(len(HeadPitchVals))], 
+        HeadYawVals[randrange(len(HeadYawVals))], 
+        LElbowRollVals[randrange(len(LElbowRollVals))], 
+        LWristYawVals[randrange(len(LWristYawVals))], 
+        RElbowRollVals[randrange(len(RElbowRollVals))], 
+        RWristYawVals[randrange(len(RWristYawVals))], 
+        RShoulderRollVals[randrange(len(RShoulderRollVals))], 
+        LShoulderRollVals[randrange(len(LShoulderRollVals))],
+        RShoulderPitchVals[randrange(len(RShoulderPitchVals))],
+        LShoulderPitchVals[randrange(len(LShoulderPitchVals))] ]
+    isAbsolute = True
+    motionservice.angleInterpolation(jointNames, angles, times, isAbsolute)
+
+
+def Hello_Gesture(motionservice):
+    #angles...
+    HeadYawVals = [0.0]
+    HeadPitchVals = [-0.2]
+
+    LWristYawVals = [0.0]
+    LElbowRollVals = [-0.5]
+    LShoulderRollVals = [0.1]
+    LShoulderPitchVals = [1.6]
+
+    RWristYawVals = [0.2]
+    RElbowRollVals = [1.5]
+    RShoulderRollVals = [-1.0]
+    RShoulderPitchVals = [0.2]
+    
+    #joint names
+    jointNames = [
+        "HeadPitch", 
+        "HeadYaw", 
+        "LElbowRoll", 
+        "LWristYaw", 
+        "RElbowRoll", 
+        "RWristYaw", 
+        "RShoulderRoll", 
+        "LShoulderRoll",
+        "RShoulderPitch",
+        "LShoulderPitch"
+    ]
+    times = [1.0] * 10
+
+    angles = [
+        HeadPitchVals[randrange(len(HeadPitchVals))], 
+        HeadYawVals[randrange(len(HeadYawVals))], 
+        LElbowRollVals[randrange(len(LElbowRollVals))], 
+        LWristYawVals[randrange(len(LWristYawVals))], 
+        RElbowRollVals[randrange(len(RElbowRollVals))], 
+        RWristYawVals[randrange(len(RWristYawVals))], 
+        RShoulderRollVals[randrange(len(RShoulderRollVals))], 
+        LShoulderRollVals[randrange(len(LShoulderRollVals))],
+        RShoulderPitchVals[randrange(len(RShoulderPitchVals))],
+        LShoulderPitchVals[randrange(len(LShoulderPitchVals))] ]
+    isAbsolute = True
+    motionservice.angleInterpolation(jointNames, angles, times, isAbsolute)
+    

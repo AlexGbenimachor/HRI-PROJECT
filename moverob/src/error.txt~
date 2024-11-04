@@ -1,0 +1,519 @@
+def locationDistance_and_angle(robData, locData, inDegrees=False):
+     #math distance...
+    distance = math.sqrt((locData[0] - robData[0])**2 + (locData[1] - robData[1])**2)
+     
+    angleRad = math.atan2(locData[1] - robData[1], locData[0] - robData[0])
+    degRadian = np.degrees(angleRad)
+    
+    if inDegrees:
+       return [round(distance,2), round(degRadian,2)]
+    else:
+       return [round(distance,2), round(angleRad,2)] 
+    
+'''define robot parameters...'''
+
+#compute robot parameters...
+Dwheel = 0.24/2 #distance wheel...
+#print("Distant wheel:", Dwheel)
+wheelradius =math.sqrt((0.08)**2 + (0.08)**2)
+#wheelradius = math.sqrt(wheelradius)
+wheelradius = round(wheelradius,3) #wheel radius...
+print(wheelradius)
+def compute_rotation(robData, locData, inDegrees = False):
+    #compute the wheel radius...
+    wheelradius =math.sqrt((0.08)**2 + (0.08)**2)
+    #wheelradius = math.sqrt(wheelradius)
+    wheelradius = round(wheelradius,2) #wheel radius...
+    #print("wheel radius:", wheelradius)
+    dist_angle = locationDistance_and_angle(robData, locData, inDegrees)
+    #compute the robot turn around given the parameters...
+    distance  = dist_angle[0]#distance
+    angle     = dist_angle[1]#angle
+    circum = 2 * math.pi * wheelradius
+    robAngle = angle * Dwheel/circum * 2
+    return [distance, robAngle]
+    
+
+
+
+
+#print("angle:", round(angle,2))
+wheelradius =  math.sqrt((0.08)**2 + (0.08)**2)
+#wheelradius =wheelradius
+wheelradius = round(wheelradius,2)
+controlTurn = 0
+while True:
+   distangle = compute_rotation(robdata, officeData, inDegrees = False)
+   distance = distangle[0]
+   print("distance:", distance)
+   targetTurn    = distangle[1]
+   print("Target Turn:", targetTurn )
+   deg_angle = np.degrees(distangle[1])
+   #print("distance and rad_angle, deg_angle:", distance, angle, deg_angle)
+   
+   tick = time.time()
+   V_des = 0.1#linear velocity
+   O_des = 0.1 * targetTurn#angular velocity
+   
+   #linear and angular velocity...
+   VR = V_des + Dwheel/2 * O_des
+   VL = V_des - Dwheel/2 * O_des
+   #print("Velocity Right and Velocity:", VR, VL)
+   
+   OmegaRight = round(VR,2)/wheelradius
+   OmegaLeft  = round(VL,2)/wheelradius
+   OmegaLeft  = round(OmegaLeft,2)
+   OmegaRight = round(OmegaRight,2)
+   #print(OmegaRight, OmegaLeft)
+   if round(targetTurn ,2) > round(controlTurn,2):
+      turnLeft(OmegaLeft, 0)
+      controlTurn = round(controlTurn,2) + 0.02
+      print("control turn left", round(controlTurn,2))
+      if round(targetTurn ,2) == round(controlTurn,2):
+         time.sleep(1)
+      forward()
+   elif round(targetTurn ,2) < round(controlTurn,2):
+      turnRight(0, OmegaRight)
+      controlTurn = round(controlTurn,2) - 0.02
+      print("control turn right",round(controlTurn,2))
+      if round(targetTurn,2) == round(controlTurn,2):
+         time.sleep(1)
+      forward()
+   elif round(distance,2) <= 0.50 :
+        stop()
+        break
+
+
+'''create Publishers...'''
+
+robPubVel  = rospy.Publisher("/robot_velocity", Float32, queue_size=1)
+robPubPose = rospy.Publisher("/robot_position", Pose, queue_size=1)
+officePub = rospy.Publisher("/officepose",  Pose, queue_size=1)
+libraryPub = rospy.Publisher("/librarypose",  Pose, queue_size=1)
+cafeteriaPub = rospy.Publisher("/cafeteriapose",  Pose, queue_size=1)
+classroomPub = rospy.Publisher("/classroomPose", Pose, queue_size=1)
+#rospy.spin()
+        
+         
+
+#Robot Parameters...
+'''
+distangle = distance_and_angle(robdata, officeData, inDegrees = False)
+radius = computeRadius()
+
+print("distance and angle:", distangle)
+print("distance wheel:", Dwheel)
+print("radius:", radius)
+
+distance = distangle[0]
+angle = distangle[1]
+'''
+"""
+N_angle = computeRotation(angle)
+print("new angle:", N_angle)
+V_rob = 0.1
+O_rob = 0.1 * N_angle
+
+VR = V_rob + Dwheel/2 * O_rob
+VL = V_rob - Dwheel/2 * O_rob
+
+print("Velocity Left:", VL)
+print("Velocity Right:", VR)
+
+#compute the omega ...
+Omega_Left = VL/radius
+Omega_Left = round(Omega_Left,2)
+Omega_Right = VR/radius
+Omega_Right = round(Omega_Right,2) 
+print("Omega Left:", -Omega_Left)
+print("Omega Right:",-Omega_Right)
+#________________________________#
+"""
+ControlTurn = 0
+while True:
+    #need robot parameters...
+    
+    robdata = getRobotPos() 
+    officeData = getOfficePos()
+    libraryData = getLibraryPos()
+    classroomData = classroomPos()
+    cafeteriaData = getCafeteriaPos()
+    print("robot position  data:", robdata) 
+    print("office position data:", officeData)
+    print("library position data:", libraryData)
+    print("cafeteria position data:", cafeteriaData)
+    print("classroom position data:", classroomData)  
+    #sensing
+    #det = detectedObs()
+    #print("detect:", det)
+    distangle = distance_and_angle(robdata, officeData, inDegrees = False)
+    radius = computeRadius()
+    distance = distangle[0]
+    angle = distangle[1]
+    print("distance:", distance)
+    print("distance and angle:", distangle)
+    print("distance wheel:", Dwheel)  
+    print("radius:", radius)
+    targetRotation = computeRotation(angle)
+    print("new angle:", targetRotation)
+    
+    #V_linear, O_angular, VR => Speed Right, VL => Speed Right 
+    V_rob = 0.1
+    O_rob = 0.1 * targetRotation
+    VR = V_rob + Dwheel/2 * O_rob
+    VL = V_rob - Dwheel/2 * O_rob
+    print("Velocity Left:", VL)
+    print("Velocity Right:", VR)
+    #compute the omega ...
+    Omega_Left = VL/radius
+    Omega_Left = round(Omega_Left,2)
+    Omega_Right = VR/radius
+    Omega_Right = round(Omega_Right,2) 
+    print("Omega Left:", Omega_Left)
+    print("Omega Right:", Omega_Right)
+    #drive Robot...
+    if (round(targetRotation,2) > round(ControlTurn,2)):
+       turnLeft(Omega_Left,  0 )
+       ControlTurn = round(ControlTurn,2) + 0.02
+       print("ControlTurn Right:", ControlTurn)
+       
+       if (round(targetRotation,2) == round(ControlTurn,2)):
+          time.sleep(1)
+       forward()
+    elif  (round(targetRotation,2) < round(ControlTurn,2)):
+       turnLeft(0,  Omega_Right)
+       ControlTurn = round(ControlTurn,2) - 0.02
+       print("ControlTurn Right:", ControlTurn)  
+       if (round(targetRotation,2) == round(ControlTurn,2)):
+          time.sleep(1)
+       forward()
+    elif round(distance,2) <= 0.90:
+       stop()
+       break
+    
+
+objangle = math.atan2(detectedPoint[1], detectedPoint[0])
+        
+         #compute the deviation from the Obstacle
+         devangle = angle - objangle
+         #compute the turn angle...
+         devrot = computeRotation(devangle)
+         
+         vdes = 0.1
+         odes = 0.1*devrot
+         velR = vdes + Dwheel/2 * odes #deviate right
+         velL = vdes - Dwheel/2 * odes#deviate angle left
+         omega_left = velL/radius
+         omega_left = round(omega_left,2)
+         omega_right= velR/radius
+         omega_right= round(omega_right,2)
+         if (round(devrot,2) > round(ControlTurn,2)):
+             backward()
+             time.sleep(1)
+             turnLeft(omega_left ,  0 )
+             ControlTurn = round(ControlTurn, 2) + 0.02
+             if (devrot == ControlTurn):
+                continue
+            #turn left
+         elif (round(devrot,2) < round(ControlTurn,2)):
+             backward()
+             time.sleep()
+             turnRight(0 ,  omega_right )
+             if (devrot == ControlTurn):
+                continue
+                
+    elif (round(distance,2) <= 1):
+       stop()
+       break
+       
+
+
+#compute then angle from detected object..
+         objangle = math.atan2(detectedPoint[1], detectedPoint[0])
+         devrot = (angle - objangle)
+         backward()#go backward...
+         vdes = 0.1
+         odes = 0.1*devrot
+         velR = vdes + Dwheel/2 * odes #deviate right
+         velL = vdes - Dwheel/2 * odes#deviate angle left
+         omega_left = velL/radius
+         omega_left = round(omega_left,2)
+         omega_right= velR/radius
+         omega_right= round(omega_right,2)
+         if (round(devrot,2) > round(ControlTurn,2)):
+            turnLeft(omega_left ,  0 )
+            ControlTurn = round(ControlTurn, 2) + 0.02
+            if (round(devrot,2) == round(ControlTurn,2)):
+               continue
+         elif (round(devrot,2) < round(ControlTurn,2)):
+            turnRight(0 ,  omega_right )
+            ControlTurn = round(ControlTurn, 2) - 0.02
+            if (round(devrot,2) == round(ControlTurn,2)):
+               continue
+               
+               
+               
+            elif detected == True:
+         backward()
+         continue
+    elif (round(distance,2) <= 1.0):
+         stop()
+         break  
+         
+         
+         
+         
+elif det == True:
+         xs = det[1]
+         objangle  = math.atan2(xs[1], xs[0])
+         devrot = (angle - objangle)
+         print("devrot:", devrot)
+         backward()#go backward...
+         vdes = 0.1
+         odes = 0.1*devrot
+         velR = vdes + Dwheel/2 * odes #deviate right
+         velL = vdes - Dwheel/2 * odes#deviate angle left
+         omega_left = velL/radius
+         omega_left = round(omega_left,2)
+         omega_right= velR/radius
+         omega_right= round(omega_right,2)
+         if (round(devrot,2) > round(ControlTurn,2)):
+            turnLeft(omega_left ,  0 )
+            ControlTurn = round(ControlTurn, 2) + 0.02
+            if (round(devrot,2) == round(ControlTurn,2)):
+               continue
+         elif (round(devrot,2) < round(ControlTurn,2)):
+            turnRight(0 ,  omega_right )
+            ControlTurn = round(ControlTurn, 2) - 0.02
+            if (round(devrot,2) == round(ControlTurn,2)):
+               continue
+               
+               
+               
+               
+ x = ''
+ControlTurn = 0
+while True:
+    #need robot parameters...
+    detected  = ObjectDetect()
+    robdata = getRobotPos() 
+    officeData = getOfficePos()
+    libraryData = getLibraryPos()
+    classroomData = classroomPos()
+    cafeteriaData = getCafeteriaPos()
+    print("robot position  data:", robdata) 
+    print("office position data:", officeData)
+    print("library position data:", libraryData)
+    print("cafeteria position data:", cafeteriaData)
+    print("classroom position data:", classroomData)  
+    #sensing
+    #det = detectedObs()
+    #print("detect:", det)
+    #detection = [x for x in det]
+   
+
+    distangle = distance_and_angle(robdata,  libraryData, inDegrees = False)
+    radius = computeRadius()
+    distance = distangle[0]
+    angle = distangle[1]
+    print("distance:", distance)
+    print("distance and angle:", distangle)
+    print("distance wheel:", Dwheel)  
+    print("radius:", radius)
+    targetRotation = computeRotation(angle)
+    print("new angle:", targetRotation)
+    
+    #V_linear, O_angular, VR => Speed Right, VL => Speed Right 
+    V_rob = 0.1
+    O_rob = 0.1 * targetRotation
+    VR = V_rob + Dwheel/2 * O_rob
+    VL = V_rob - Dwheel/2 * O_rob
+    print("Velocity Left:", VL)
+    print("Velocity Right:", VR)
+    #compute the omega ...
+    Omega_Left = VL/radius
+    Omega_Left = round(Omega_Left,2)
+    Omega_Right = VR/radius
+    Omega_Right = round(Omega_Right,2) 
+    print("Omega Left:", Omega_Left)
+    print("Omega Right:", Omega_Right)
+    #drive Robot...
+    if (round(targetRotation,2) > round(ControlTurn,2)):
+       turnLeft(Omega_Left,  0 )
+       ControlTurn = round(ControlTurn,2) + 0.02
+       print("ControlTurn Right:", ControlTurn)
+       
+       if (round(targetRotation,2) == round(ControlTurn,2)):
+          time.sleep(1)
+          forward()
+    elif  (round(targetRotation,2) < round(ControlTurn,2)):
+       turnRight(0,  Omega_Right)
+       ControlTurn = round(ControlTurn,2) - 0.02
+       print("ControlTurn Right:", ControlTurn)  
+       if (round(targetRotation,2) == round(ControlTurn,2)):
+          time.sleep(1)
+       forward()
+    elif detected[0] == True:
+         print("Detected:", detected)
+         backward()
+         continue
+    elif (round(distance) <= 1.0):
+         stop()
+         break  
+
+                        
+
+def publish_OfficeData():
+    while not rospy.is_shutdown():
+        robOfficePub =  rospy.Publisher("/robot_Office_Data", JointState, queue_size =10 )
+        msg = JointState()
+        rate=rospy.Rate(10)
+        robdata = getRobotPos() 
+        officeData = getOfficePos()
+        distangle = distance_and_angle(robdata,  officeData, inDegrees = False)
+        radius = computeRadius()
+        distance = distangle[0]
+        angle = distangle[1]
+        rotation = computeRotation(angle)
+        robOff_Data = [distance,  rotation]
+        msg.position = robOff_Data
+   
+        robOfficePub.publish(msg)
+          #rate.sleep()
+    
+    
+def Drive_callback(msg):
+    ''' the call message takes two parameters'''
+    '''
+    distance: measures the distance from the goal
+    rotation: the rotation angle of the robot to the target object
+    '''
+    ControlTurn = 0
+    distance = msg.position[0]
+    targetRotation = msg.position[1]
+    radius = computeRadius()
+    while True:
+       #need robot parameters...
+       
+    
+       #V_linear, O_angular, VR => Speed Right, VL => Speed Right 
+       V_rob = 0.1
+       O_rob = 0.1 * targetRotation
+       VR = V_rob + Dwheel/2 * O_rob
+       VL = V_rob - Dwheel/2 * O_rob
+       print("Velocity Left:", VL)
+       print("Velocity Right:", VR)
+       #compute the omega ...
+       Omega_Left = VL/radius
+       Omega_Left = round(Omega_Left,2)
+       Omega_Right = VR/radius
+       Omega_Right = round(Omega_Right,2) 
+       print("Omega Left:", Omega_Left)
+       print("Omega Right:", Omega_Right)
+       #drive Robot...
+       if (round(targetRotation,2) > round(ControlTurn,2)):
+          turnLeft(Omega_Left,  0 )
+          ControlTurn = round(ControlTurn,2) + 0.02
+          print("ControlTurn Left:", ControlTurn)
+       
+          if (round(targetRotation,2) == round(ControlTurn,2)):
+             time.sleep(1)
+          forward()
+       elif  (round(targetRotation,2) < round(ControlTurn,2)):
+          turnRight(0,  Omega_Right)
+          ControlTurn = round(ControlTurn,2) - 0.02
+          print("ControlTurn Right:", ControlTurn)  
+          if (round(targetRotation,2) == round(ControlTurn,2)):
+             time.sleep(1)
+          forward()
+       elif (round(distance) <= 1.0):
+            stop()
+            break  
+
+             
+
+      
+
+
+
+if __name__ == "__main__":
+   rospy.Subscriber("/robot_Office_Data", JointState, Drive_callback,  queue_size=1)
+   publish_OfficeData()
+   
+   #rospy.Subscriber("/robot_Office_Data", JoinState, Drive_callback,  queue_size=1)
+
+def publish_OfficeData():
+    while not rospy.is_shutdown():
+        robOfficePub =  rospy.Publisher("/robot_Office_Data", JointState, queue_size =1 )
+        msg = JointState()
+        rate=rospy.Rate(10)
+        robdata = getRobotPos() 
+        officeData = getOfficePos()
+        #print("office Data:",  officeData)
+        distangle = distance_and_angle(robdata,  officeData, inDegrees = False)
+        radius = computeRadius()
+        distance = distangle[0]
+        angle = distangle[1]
+        rotation = computeRotation(angle)
+        robOff_Data = [distance,  rotation]
+        msg.position = robOff_Data
+        
+        robOfficePub.publish(msg)
+        
+        
+  
+def Drive_callback(msg):
+    ''' the call message takes two parameters'''
+    '''
+    distance: measures the distance from the goal
+    rotation: the rotation angle of the robot to the target object
+    '''
+    ControlTurn = 0      
+    
+    while not rospy.is_shutdown():
+       distance = msg.position[0]
+       targetRotation = msg.position[1]
+       radius = computeRadius()
+       #V_linear, O_angular, VR => Speed Right, VL => Speed Right 
+       V_rob = 0.1
+       O_rob = 0.1 * targetRotation
+       VR = V_rob + Dwheel/2 * O_rob
+       VL = V_rob - Dwheel/2 * O_rob
+       print("Velocity Left:", VL)
+       print("Velocity Right:", VR)
+       #compute the omega ...
+       Omega_Left = VL/radius
+       Omega_Left = round(Omega_Left,2)
+       Omega_Right = VR/radius
+       Omega_Right = round(Omega_Right,2) 
+       print("Omega Left:", Omega_Left)
+       print("Omega Right:", Omega_Right)
+       #drive Robot...
+       if (round(targetRotation,2) > round(ControlTurn,2)):
+          turnLeft(Omega_Left,  0 )
+          ControlTurn = round(ControlTurn,2) + 0.02
+          print("ControlTurn Left:", ControlTurn)
+       
+          if (round(targetRotation,2) == round(ControlTurn,2)):
+              time.sleep(1)
+          forward()
+       elif  (round(targetRotation,2) < round(ControlTurn,2)):
+          turnRight(0,  Omega_Right)
+          ControlTurn = round(ControlTurn,2) - 0.02
+          print("ControlTurn Right:", ControlTurn)  
+          if (round(targetRotation,2) == round(ControlTurn,2)):
+             time.sleep(1)
+          forward()
+       elif (round(distance) <= 1.0):
+             stop()
+
+def sub():
+  rospy.Subscriber("/robot_Office_Data", JointState, Drive_callback,  queue_size=1)        
+  rospy.spin()      
+        
+if __name__ == "__main__":
+   rospy.Subscriber("/robot_Office_Data", JointState, Drive_callback,  queue_size=1)      
+   publish_OfficeData()
+   
+      
+      

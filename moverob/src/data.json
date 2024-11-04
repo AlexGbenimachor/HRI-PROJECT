@@ -1,0 +1,47 @@
+[
+   {
+      "text":"[\"Hello\", \"Ciao\",  \"Hyah yah\", \"Hi there\", \"Hola\"]",
+      "intent":"\"Greetings\"",
+      "responses":"[\"Hi <Human>, How can I assist you?\",  \"Hello <Human> How can I Help you?\" ,  \"Hello <Human>,  How may I help you?\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> can lead me to zara?\", \"Hello <Robot> can you show me the way to zara?\", \"Hi, <Robot> can you direct to zara?\", \"Hi <Robot> How do i get to zara?\"]",
+      "intent":"\"Accompany zara\"",
+      "responses":"[\"To go to the zara\", \"<go forward>\",\"<turn right>\", \"<go forward>\", \"and <infront> zara\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> can lead me to coin?\",\"Hello <Robot> can you show me the way to coin?\", \"Hi, <Robot> can you direct to coin?\", \"Hi <Robot> How do i get to coin?\"]",
+      "intent":"\"Accompany coin\"",
+      "responses":"[\"To go to the coin\", \"<turn left>\",  \"<go forward>\", \"<turn right>\", \"<infront> coin_store\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> can lead me to footlocker?\",\"Hello <Robot> can you show me the way to footlocker?\", \"Hi, <Robot> can you direct to footlocker?\", \"Hi <Robot> How do i get to footlocker?\"]",
+      "intent":"\"Accompany footlocker\"",
+      "responses":"[\"To go to the footlocker\", \"<go left>\", \"<go forward>\", \"<turn right>\", \"and <infront> footlocker\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> can lead me to OVS?\",\"Hello <Robot> can you show me the way to OVS?\", \"Hi, <Robot> can you direct to OVS?\",  \"Hi <Robot> How do i get to OVS?\"]",
+      "intent":"\"Accompany OVS\"",
+      "responses":"[\"To go to the OVS\", \"<turn left>\",  \"<go forward>\", \"<turn right>\", \"<infront> OVS_store\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> please can you give me the Information about zara?\"\"Hello <Robot> please can you tell me about zara?\", \"Hello <Robot> please can you give me the Information about zara?\",\"Hi <Robot> please can you tell me about zara?\"]",
+      "intent":"\"Information zara\"",
+      "responses":"[\"You <go forward>\",\"<turn right>\", \"<go forward>\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> please can you give me the Information about coin?\",\"Hello <Robot> please can you tell me about coin?\", \"Hello <Robot> please can you give me the Information about coin?\",\"Hi <Robot> please can you tell me about coin?\"]",
+      "intent":"\"Information coin\"",
+      "responses":"[\"<turn left>\", \"<go forward>\", \"<turn left>\", \"stand <in front>\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> please can you give me the Information about OVS?\",\"Hello <Robot> please can you tell me about OVS?\", \"Hello <Robot> please can you give me the Information about OVS?\",\"Hi <Robot> please can you tell me about OVS?\"]",
+      "intent":"\"Information OVS\"",
+      "responses":"[\"<turn left>\", \"<go forward>\", \"<turn right>\",\"<in front>\"]"
+   },
+   {
+      "text":"[\"Hi <Robot> please can you give me the Information about footlocker?\",\"Hello <Robot> please can you tell me about footlocker?\", \"Hello <Robot> please can you give me the Information about footlocker?\",\"Hi <Robot> please can you tell me about footlocker?\"]",
+      "intent":"\"Information footlocker\"",
+      "responses":"[\"<go left>\", \"<go forward>\", \"<turn right>\", \"<in front>\"]"
+   }
+]

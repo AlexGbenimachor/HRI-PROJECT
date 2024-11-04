@@ -1,0 +1,142 @@
+[
+   {
+      "text":[
+         "Hi",
+         "Hey",
+         "Hola",
+         "What's up?",
+         "Hello"
+      ],
+      "intent":"Greetings",
+      "responses":[
+         "Hi <Human>  How can I assist you ?",
+         "Hello <Human>  How can I Help you ?",
+         "Hello  <Human>   How may I help you ?",
+         "Hi <Human>  How can I be of assistance ?"
+      ]
+   },
+   {
+      "text":[
+         "hi <robot> can you lead me to the  office ?",
+         "hello <robot> can you take me to the  office ?",
+         "hi <robot> can you accompany me to the office ?",
+         "hi <robot> can you assist me  to the office ?"
+      ],
+      "intent":"Accompany office",
+      "responses":[
+         "to go to the office",
+         "<go_forward>",
+         "<turn_right>",
+         "<go_forward>",
+         "and <in_front> of the office"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> can  you lead me to the library ?",
+         "Hello <Robot> can you take me to the  library ?",
+         "Hi <Robot> can you accompany me to the library ?",
+         "Hi <Robot> can you assist me  to the library ?"
+      ],
+      "intent":"Accompany library",
+      "responses":[
+         "To go to the library",
+         "<turn_left>",
+         "<go_forward>",
+         "<turn_right>",
+         "<in_front> of the library"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> can  you lead me to the classroom ?",
+         "Hello <Robot> can you take me to the  classroom ?",
+         "Hi <Robot> can you accompany me to the classroom ?",
+         "Hi <Robot> can you assist me  to the classroom ?"
+      ],
+      "intent":"Accompany classroom",
+      "responses":[
+         "To go to the classroom",
+         "<turn_left>",
+         "<go_forward>",
+         "<turn_right>",
+         "and <in_front> of the classroom"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> can  you lead me to the cafeteria ?",
+         "Hello <Robot> can you take me to the  cafeteria ?",
+         "Hi <Robot> can you accompany me to the cafeteria ?",
+         "Hi <Robot> can you assist me  to the cafeteria ?"
+      ],
+      "intent":"Accompany cafeteria",
+      "responses":[
+         "To go to the cafeteria",
+         "<turn_left>",
+         "<go_forward>",
+         "<turn_right>",
+         "<in_front> of the cafeteria"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> please can you tell me how to get to the office ?",
+         "Hello <Robot> please can you show how to get to the office ?",
+         "Hello <Robot> please can you give me the Information on how to get to the office?",
+         "Hi <Robot> please can you direct me to the office ?"
+      ],
+      "intent":"Information office",
+      "responses":[
+         "You <go_forward>",
+         "<turn_right>",
+         "<go_forward>",
+         "<in_front> of the office"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> please can you tell me how to get to the library ?",
+         "Hello <Robot> please can you show how to get to the library ?",
+         "Hello <Robot> please can you give me the Information on how to get to the library ?",
+         "Hi <Robot> please can you direct me to the library ?"
+      ],
+      "intent":"Information library",
+      "responses":["You", 
+         "<turn_left>",
+         "<go_forward>",
+         "<turn_left>",
+         "stand <in_front> of the library"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> please can you tell me how to get to the classroom ?",
+         "Hello <Robot> please can you show how to get to the classroom ?",
+         "Hello <Robot> please can you give me the Information on how to get to the classroom ?",
+         "Hi <Robot> please can you direct me to the classroom ?"
+      ],
+      "intent":"Information classroom",
+      "responses":["you", 
+         "<turn_left>",
+         "<go_forward>",
+         "<turn_right>",
+         "<in_front> of the classroom"
+      ]
+   },
+   {
+      "text":[
+         "Hi <Robot> please can you tell me how to get to the cafeteria ?",
+         "Hello <Robot> please can you show how to get to the cafeteria ?",
+         "Hello <Robot> please can you give me the Information on how to get to the cafeteria ?",
+         "Hi <Robot> please can you direct me to the cafeteria ?"
+      ],
+      "intent":"Information cafeteria",
+      "responses":["You",
+         "<turn_left>",
+         "<go_forward>",
+         "<turn_right>",
+         "<in_front> of the cafeteria"
+      ]
+   }
+]
